@@ -1,0 +1,24 @@
+- name: Disable timers for unattended upgrade, so that none will be triggered by the `date -s` call.
+  become: yes
+  raw: systemctl stop apt-daily.service
+
+- name: Reload systemctl daemon to apply the new changes
+  become: yes
+  raw: systemctl kill --kill-who=all apt-daily.service
+
+# Syncing time is only relevant for testing, because of the VM's outdated date.
+#- name: Sync time
+#  raw: date -s "{{ lookup('pipe', 'date') }}"
+
+- name: Wait for any possibly running unattended upgrade to finish
+  become: yes
+  shell: while ! (systemctl list-units --all apt-daily.service | fgrep -q dead); do sleep 1; done;
+
+- name: install packages (Debian)
+  become: yes
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  tags: package

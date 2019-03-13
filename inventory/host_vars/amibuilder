@@ -1,0 +1,5 @@
+base_image: ami-ea4ba68d
+group_id: sg-e1584b88
+vpc_subnet_id: subnet-efa3cd94
+ansible_ssh_user: ubuntu
+private_pem: /home/ubuntu/spanugotest.pem
